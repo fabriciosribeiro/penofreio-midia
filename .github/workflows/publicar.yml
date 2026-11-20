@@ -1,0 +1,41 @@
+name: publicar
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "teste (prepara sem publicar) ou publicar"
+        type: choice
+        options: [teste, publicar]
+        default: teste
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publicar o que venceu
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          MODO: ${{ inputs.modo || 'publicar' }}
+        run: python3 publicar.py
+      - name: Gravar a fila
+        if: always()
+        run: |
+          if ! git diff --quiet fila.json; then
+            git config user.name "publicador"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -am "fila: marca post publicado"
+            git push
+          fi
