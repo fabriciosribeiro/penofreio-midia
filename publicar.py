@@ -78,14 +78,18 @@ def main():
     if not vencidos:
         print("Nada para publicar agora.")
         return
-    item = vencidos[0]
-    if agora - datetime.datetime.fromisoformat(item["quando"]) > ATRASO_MAXIMO:
-        sys.exit(f"{item['imagem']} passou mais de 12 h do horário; não publico sozinho.")
-    achado = ja_publicado(item)
-    if achado:
-        print(f"{item['imagem']} já estava no ar ({achado.get('permalink')}); só marco na fila.")
-        item["publicado"] = {"id": achado["id"], "link": achado.get("permalink"), "em": agora.isoformat(timespec="minutes")}
-    else:
+    alvo = None
+    for item in vencidos:  # marca o que já está no ar; publica no máximo um
+        achado = ja_publicado(item)
+        if achado:
+            print(f"{item['imagem']} já estava no ar ({achado.get('permalink')}); só marco na fila.")
+            item["publicado"] = {"id": achado["id"], "link": achado.get("permalink"), "em": agora.isoformat(timespec="minutes")}
+        elif agora - datetime.datetime.fromisoformat(item["quando"]) > ATRASO_MAXIMO:
+            print(f"AVISO: {item['imagem']} passou mais de 12 h do horário; não publico sozinho.")
+        elif alvo is None:
+            alvo = item
+    if alvo:
+        item = alvo
         cid, st = preparar(item)
         if st != "FINISHED":
             sys.exit(f"Contêiner de {item['imagem']} ficou {st}.")
