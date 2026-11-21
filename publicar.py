@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Publica no Instagram do Pé no Freio os posts de imagem da fila (fila.json) quando chega a hora.
 
-Roda no GitHub Actions a cada 15 minutos. Publica no máximo um post por execução.
+Roda no GitHub Actions duas vezes por hora (o GitHub atrasa ou pula rodadas agendadas; a que cair até 4 h antes de um
+post espera o horário). Publica no máximo um post por execução.
 MODO=teste: prepara o contêiner do próximo post pendente e confere se a Meta aceitou a imagem, SEM publicar.
 
 Segredos (GitHub Actions): INSTAGRAM_ACCESS_TOKEN e INSTAGRAM_USER_ID. O token nunca é impresso.
@@ -14,6 +15,7 @@ UID = os.environ["INSTAGRAM_USER_ID"]
 REPO = os.environ.get("GITHUB_REPOSITORY", "fabriciosribeiro/penofreio-midia")
 MODO = os.environ.get("MODO", "publicar")
 ATRASO_MAXIMO = datetime.timedelta(hours=12)  # passou disso, não publica sozinho: avisa
+ESPERA_MAXIMA = datetime.timedelta(hours=4)   # o agendamento do GitHub atrasa horas: a rodada que cair antes espera o horário
 AQUI = os.path.dirname(os.path.abspath(__file__))
 FILA = os.path.join(AQUI, "fila.json")
 
@@ -74,6 +76,12 @@ def main():
         print(f"Teste: {pendentes[0]['imagem']} → contêiner {st} (não publicado; expira em 24 h).")
         sys.exit(0 if st == "FINISHED" else 1)
 
+    proximos = [i for i in pendentes if agora < datetime.datetime.fromisoformat(i["quando"]) <= agora + ESPERA_MAXIMA]
+    if MODO == "publicar" and proximos and not [i for i in pendentes if datetime.datetime.fromisoformat(i["quando"]) <= agora]:
+        espera = (datetime.datetime.fromisoformat(proximos[0]["quando"]) - agora).total_seconds() + 20
+        print(f"{proximos[0]['imagem']} sai em {int(espera // 60)} min: esperando o horário.", flush=True)
+        time.sleep(espera)
+        agora = datetime.datetime.now(datetime.timezone.utc)
     vencidos = [i for i in pendentes if datetime.datetime.fromisoformat(i["quando"]) <= agora]
     if not vencidos:
         print("Nada para publicar agora.")
