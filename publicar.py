@@ -40,6 +40,8 @@ def preparar(item):
     if item.get("video"):  # meme em Reels: o mp4 fica em imagens/ junto do jpg
         base = dict(media_type="REELS", video_url=arquivo.rsplit("/", 1)[0] + "/" + item["video"],
                     caption=item["legenda"], share_to_feed="true")
+        if item.get("capa"):  # capa própria do Reels (jpg em imagens/)
+            base["cover_url"] = arquivo.rsplit("/", 1)[0] + "/" + item["capa"]
     else:
         base = dict(image_url=arquivo, caption=item["legenda"])
     extras = {}
