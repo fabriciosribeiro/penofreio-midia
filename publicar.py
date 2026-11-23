@@ -36,10 +36,14 @@ def chamar(metodo, caminho, **params):
 
 
 def preparar(item):
-    base = dict(image_url=f"https://raw.githubusercontent.com/{REPO}/main/imagens/{item['imagem']}",
-                caption=item["legenda"])
+    arquivo = f"https://raw.githubusercontent.com/{REPO}/main/imagens/{item['imagem']}"
+    if item.get("video"):  # meme em Reels: o mp4 fica em imagens/ junto do jpg
+        base = dict(media_type="REELS", video_url=arquivo.rsplit("/", 1)[0] + "/" + item["video"],
+                    caption=item["legenda"], share_to_feed="true")
+    else:
+        base = dict(image_url=arquivo, caption=item["legenda"])
     extras = {}
-    if item.get("alt"):
+    if item.get("alt") and not item.get("video"):
         extras["alt_text"] = item["alt"]
     if item.get("ia"):
         extras["is_ai_generated"] = "true"
@@ -49,7 +53,7 @@ def preparar(item):
         r = chamar("POST", f"{UID}/media", **base)
     if "id" not in r:
         sys.exit(f"Falha ao criar o contêiner de {item['imagem']}: {r}")
-    for _ in range(24):
+    for _ in range(72 if item.get("video") else 24):  # vídeo: a Meta processa por até ~6 min
         st = chamar("GET", r["id"], fields="status_code")
         if st.get("status_code") in ("FINISHED", "ERROR", "EXPIRED"):
             break
