@@ -15,7 +15,7 @@ UID = os.environ["INSTAGRAM_USER_ID"]
 REPO = os.environ.get("GITHUB_REPOSITORY", "fabriciosribeiro/penofreio-midia")
 MODO = os.environ.get("MODO", "publicar")
 ATRASO_MAXIMO = datetime.timedelta(hours=12)  # passou disso, não publica sozinho: avisa
-ESPERA_MAXIMA = datetime.timedelta(hours=4)   # o agendamento do GitHub atrasa horas: a rodada que cair antes espera o horário
+ESPERA_MAXIMA = datetime.timedelta(hours=5, minutes=45)  # o GitHub roda o agendamento a cada 4 a 8 h: a rodada que cair antes espera o horário
 AQUI = os.path.dirname(os.path.abspath(__file__))
 FILA = os.path.join(AQUI, "fila.json")
 
