@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publica no Instagram do Pé no Freio os posts de imagem da fila (fila.json) quando chega a hora.
+"""Publica no Instagram do Pé no Freio os posts da fila (imagem, Reels ou carrossel) (fila.json) quando chega a hora.
 
 Roda no GitHub Actions duas vezes por hora (o GitHub atrasa ou pula rodadas agendadas; a que cair até 4 h antes de um
 post espera o horário). Publica no máximo um post por execução.
@@ -35,7 +35,43 @@ def chamar(metodo, caminho, **params):
         return {"erro": e.code, "mensagem": erro.get("message"), "detalhe": erro.get("error_user_msg")}
 
 
+def esperar(cid, vezes):
+    st = {}
+    for _ in range(vezes):
+        st = chamar("GET", cid, fields="status_code")
+        if st.get("status_code") in ("FINISHED", "ERROR", "EXPIRED"):
+            break
+        time.sleep(5)
+    return st.get("status_code")
+
+
+def preparar_carrossel(item):
+    """Carrossel: um contêiner por imagem (com texto alternativo) e o contêiner pai com a legenda."""
+    pasta = f"https://raw.githubusercontent.com/{REPO}/main/imagens/"
+    alts = item.get("alts") or []
+    filhos = []
+    for k, img in enumerate(item["carrossel"]):
+        extras = {"alt_text": alts[k]} if k < len(alts) and alts[k] else {}
+        r = chamar("POST", f"{UID}/media", image_url=pasta + img, is_carousel_item="true", **extras)
+        if "id" not in r and extras:
+            r = chamar("POST", f"{UID}/media", image_url=pasta + img, is_carousel_item="true")
+        if "id" not in r:
+            sys.exit(f"Falha na tela {img} do carrossel: {r}")
+        if esperar(r["id"], 24) != "FINISHED":
+            sys.exit(f"A Meta não aceitou a tela {img}.")
+        filhos.append(r["id"])
+    extras = {"is_ai_generated": "true"} if item.get("ia") else {}
+    r = chamar("POST", f"{UID}/media", media_type="CAROUSEL", children=",".join(filhos), caption=item["legenda"], **extras)
+    if "id" not in r and extras:
+        r = chamar("POST", f"{UID}/media", media_type="CAROUSEL", children=",".join(filhos), caption=item["legenda"])
+    if "id" not in r:
+        sys.exit(f"Falha ao criar o carrossel {item['imagem']}: {r}")
+    return r["id"], esperar(r["id"], 24)
+
+
 def preparar(item):
+    if item.get("carrossel"):
+        return preparar_carrossel(item)
     arquivo = f"https://raw.githubusercontent.com/{REPO}/main/imagens/{item['imagem']}"
     if item.get("video"):  # meme em Reels: o mp4 fica em imagens/ junto do jpg
         base = dict(media_type="REELS", video_url=arquivo.rsplit("/", 1)[0] + "/" + item["video"],
