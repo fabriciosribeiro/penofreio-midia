@@ -7,7 +7,7 @@ MODO=teste: prepara o contêiner do próximo post pendente e confere se a Meta a
 
 Lembretes: item com "lembrete" (texto) não publica nada; manda o texto ao fundador pelo Telegram na hora marcada,
 com o vídeo de "video" (em imagens/) e o "texto_app" numa mensagem separada, pronta para copiar. O robô também avisa
-no Telegram quando publica ou falha.
+no Telegram quando publica ou falha e quando aparece página nova no sitemap do site (site-visto.json guarda as já vistas).
 
 Segredos (GitHub Actions): INSTAGRAM_ACCESS_TOKEN e INSTAGRAM_USER_ID; TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID
 (opcionais: sem eles, os avisos só vão para o log). Os tokens nunca são impressos.
@@ -23,6 +23,8 @@ ATRASO_MAXIMO = datetime.timedelta(hours=12)  # passou disso, não publica sozin
 ESPERA_MAXIMA = datetime.timedelta(hours=5, minutes=45)  # o GitHub roda o agendamento a cada 4 a 8 h: a rodada que cair antes espera o horário
 AQUI = os.path.dirname(os.path.abspath(__file__))
 FILA = os.path.join(AQUI, "fila.json")
+SITE_VISTO = os.path.join(AQUI, "site-visto.json")
+SITEMAP = "https://penofreio.com.br/sitemap.xml"
 
 
 def chamar(metodo, caminho, **params):
@@ -66,6 +68,27 @@ def enviar_lembrete(item):
     if ok and item.get("texto_app"):
         ok = telegram("sendMessage", text=item["texto_app"])
     return ok
+
+
+def conferir_site():
+    """Avisa pelo Telegram cada página nova no sitemap do site (artigo publicado)."""
+    import re
+    try:
+        req = urllib.request.Request(SITEMAP, headers={"User-Agent": "Mozilla/5.0 (penofreio-robo)"})
+        xml = urllib.request.urlopen(req, timeout=30).read().decode()
+    except urllib.error.URLError as e:
+        print(f"Sitemap indisponível: {e}")
+        return
+    agora = set(re.findall(r"<loc>([^<]+)</loc>", xml))
+    visto = set(json.load(open(SITE_VISTO, encoding="utf-8"))) if os.path.exists(SITE_VISTO) else set()
+    novas = sorted(agora - visto)
+    if not novas:
+        return
+    if visto:  # na primeira vez só grava a lista
+        for url in novas:
+            avisar(f"Pé no Freio: página nova no site. {url}")
+    json.dump(sorted(visto | agora), open(SITE_VISTO, "w", encoding="utf-8"), indent=1)
+    open(SITE_VISTO, "a").write("\n")
 
 
 def esperar(cid, vezes):
@@ -141,6 +164,8 @@ def ja_publicado(item):
 
 
 def main():
+    if MODO == "publicar":
+        conferir_site()
     fila = json.load(open(FILA, encoding="utf-8"))
     agora = datetime.datetime.now(datetime.timezone.utc)
     pendentes = [i for i in fila if not i.get("publicado") and not i.get("lembrete")]
