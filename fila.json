@@ -104,7 +104,8 @@
   },
   {
     "quando": "2026-11-26T12:46:14-03:00",
-    "lembrete": "Pé no Freio: teste do robô. Se esta mensagem chegou, os avisos da fila estão ligados (lembretes, post publicado ou com falha, página nova no site). Não precisa fazer nada."
+    "lembrete": "Pé no Freio: teste do robô. Se esta mensagem chegou, os avisos da fila estão ligados (lembretes, post publicado ou com falha, página nova no site). Não precisa fazer nada.",
+    "enviado": "2026-11-26T15:46+00:00"
   },
   {
     "quando": "2026-11-26T19:00:00-03:00",
