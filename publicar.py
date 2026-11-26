@@ -91,6 +91,17 @@ def conferir_site():
     open(SITE_VISTO, "a").write("\n")
 
 
+def enviar_lembretes(fila, agora):
+    """Lembretes vencidos (até 12 h de atraso) vão pelo Telegram, uma vez cada."""
+    for lem in fila:
+        if not lem.get("lembrete") or lem.get("enviado"):
+            continue
+        quando = datetime.datetime.fromisoformat(lem["quando"])
+        if quando <= agora < quando + ATRASO_MAXIMO and enviar_lembrete(lem):
+            lem["enviado"] = agora.isoformat(timespec="minutes")
+            print(f"Lembrete enviado: {lem['lembrete'][:60]}")
+
+
 def esperar(cid, vezes):
     st = {}
     for _ in range(vezes):
@@ -169,6 +180,7 @@ def main():
     fila = json.load(open(FILA, encoding="utf-8"))
     agora = datetime.datetime.now(datetime.timezone.utc)
     pendentes = [i for i in fila if not i.get("publicado") and not i.get("lembrete")]
+    enviar_lembretes(fila, agora)  # antes de esperar o horário de algum post
     if MODO == "teste":
         if not pendentes:
             sys.exit("Nada pendente na fila.")
@@ -182,12 +194,7 @@ def main():
         print(f"{proximos[0]['imagem']} sai em {int(espera // 60)} min: esperando o horário.", flush=True)
         time.sleep(espera)
         agora = datetime.datetime.now(datetime.timezone.utc)
-    for lem in fila:  # lembretes vencidos (até 12 h de atraso) vão pelo Telegram
-        quando = datetime.datetime.fromisoformat(lem["quando"])
-        if lem.get("lembrete") and not lem.get("enviado") and quando <= agora < quando + ATRASO_MAXIMO:
-            if enviar_lembrete(lem):
-                lem["enviado"] = agora.isoformat(timespec="minutes")
-                print(f"Lembrete enviado: {lem['lembrete'][:60]}")
+    enviar_lembretes(fila, agora)
     vencidos = [i for i in pendentes if datetime.datetime.fromisoformat(i["quando"]) <= agora]
     if not vencidos:
         print("Nada para publicar agora.")

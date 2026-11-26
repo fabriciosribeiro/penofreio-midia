@@ -103,6 +103,10 @@
     "video": "2026-11-26-m13.mp4"
   },
   {
+    "quando": "2026-11-26T12:46:14-03:00",
+    "lembrete": "Pé no Freio: teste do robô. Se esta mensagem chegou, os avisos da fila estão ligados (lembretes, post publicado ou com falha, página nova no site). Não precisa fazer nada."
+  },
+  {
     "quando": "2026-11-26T19:00:00-03:00",
     "imagem": "2026-11-26-carrossel-01.jpg",
     "carrossel": [
@@ -149,13 +153,13 @@
   },
   {
     "quando": "2026-11-27T19:00:00-03:00",
-    "lembrete": "Pé no Freio: amanhã, sábado 28/11, às 12h, você publica o meme da tartaruga (m15) pelo app. Mando o vídeo e a legenda agora pra você já deixar salvo, e lembro de novo às 11h50.\n\nNo app: + > Reels > escolher o vídeo > Áudio: uma música em alta (seta de tendência) > colar a legenda > Configurações avançadas: ligar \"Rótulo de IA\" > Compartilhar.",
+    "lembrete": "Pé no Freio: amanhã, sábado 28/11, às 12h, você publica o meme da tartaruga (m15) pelo app do Instagram, com uma música em alta. É o teste para saber se a queda de alcance vem da publicação pelo robô ou da música repetida. Já mando o vídeo e a legenda para você deixar salvo; amanhã às 11h50 eu lembro de novo, com o mesmo passo a passo.\n\nPasso a passo (cerca de 3 min):\n1. Salve o vídeo: toque no vídeo logo abaixo, depois nos 3 pontinhos e em \"Salvar na galeria\".\n2. Copie a legenda: toque e segure a última mensagem (a legenda) e toque em \"Copiar\".\n3. Abra o Instagram e confira que está na conta @penofreio.com.br (o nome aparece no topo do perfil; se não, toque no nome e troque).\n4. Toque no \"+\" e escolha \"Reels\".\n5. Escolha o vídeo da tartaruga na galeria e toque em \"Avançar\".\n6. Toque no ícone de nota musical (\"Áudio\"). Escolha uma música com a setinha de tendência (↗), animada, de preferência sem letra. Toque em \"Concluir\".\n7. Se aparecer o controle de volume, deixe a música em 100% (o vídeo não tem som próprio). Toque em \"Avançar\".\n8. Toque em \"Escreva uma legenda\", segure e cole a legenda copiada. Confira que o texto termina nas hashtags.\n9. Toque em \"Editar capa\" e escolha um quadro em que a frase de cima e a tartaruga apareçam inteiras.\n10. Desça até \"Mais opções\" (ou \"Configurações avançadas\") e ligue \"Adicionar rótulo de IA\". É obrigatório: a imagem foi feita com IA.\n11. Confira que \"Compartilhar também no Feed\" está ligado.\n12. Às 12h em ponto, toque em \"Compartilhar\".\n\nPronto. Não precisa responder: eu leio os números depois. Se algo der errado, conte na próxima conversa com o Claude.",
     "video": "2026-11-28-m15-sem-musica.mp4",
     "texto_app": "Pra esses momentos: pé no freio.\n\nManda pra quem ainda tá esperando a entrega da Black Friday passada.\n\nSegue o @penofreio.com.br pra rir antes de comprar.\n\nImagem feita com IA.\n\n#fretegratis #blackfriday #humor #financaspessoais"
   },
   {
     "quando": "2026-11-28T11:50:00-03:00",
-    "lembrete": "Pé no Freio: daqui a 10 min, 12h, publica o meme da tartaruga pelo app, com música em alta e rótulo de IA ligado. Vídeo e legenda logo abaixo.",
+    "lembrete": "Pé no Freio: às 12h (daqui a 10 min) publique o meme da tartaruga (m15) pelo app do Instagram. Se já salvou o vídeo ontem, pule o passo 1.\n\nPasso a passo (cerca de 3 min):\n1. Salve o vídeo: toque no vídeo logo abaixo, depois nos 3 pontinhos e em \"Salvar na galeria\".\n2. Copie a legenda: toque e segure a última mensagem (a legenda) e toque em \"Copiar\".\n3. Abra o Instagram e confira que está na conta @penofreio.com.br (o nome aparece no topo do perfil; se não, toque no nome e troque).\n4. Toque no \"+\" e escolha \"Reels\".\n5. Escolha o vídeo da tartaruga na galeria e toque em \"Avançar\".\n6. Toque no ícone de nota musical (\"Áudio\"). Escolha uma música com a setinha de tendência (↗), animada, de preferência sem letra. Toque em \"Concluir\".\n7. Se aparecer o controle de volume, deixe a música em 100% (o vídeo não tem som próprio). Toque em \"Avançar\".\n8. Toque em \"Escreva uma legenda\", segure e cole a legenda copiada. Confira que o texto termina nas hashtags.\n9. Toque em \"Editar capa\" e escolha um quadro em que a frase de cima e a tartaruga apareçam inteiras.\n10. Desça até \"Mais opções\" (ou \"Configurações avançadas\") e ligue \"Adicionar rótulo de IA\". É obrigatório: a imagem foi feita com IA.\n11. Confira que \"Compartilhar também no Feed\" está ligado.\n12. Às 12h em ponto, toque em \"Compartilhar\".\n\nPronto. Não precisa responder: eu leio os números depois. Se algo der errado, conte na próxima conversa com o Claude.",
     "video": "2026-11-28-m15-sem-musica.mp4",
     "texto_app": "Pra esses momentos: pé no freio.\n\nManda pra quem ainda tá esperando a entrega da Black Friday passada.\n\nSegue o @penofreio.com.br pra rir antes de comprar.\n\nImagem feita com IA.\n\n#fretegratis #blackfriday #humor #financaspessoais"
   },
