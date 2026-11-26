@@ -148,13 +148,16 @@
     "publicado": null
   },
   {
-    "quando": "2026-11-28T12:00:00-03:00",
-    "imagem": "2026-11-28-m15.jpg",
-    "legenda": "Pra esses momentos: pé no freio.\n\nManda pra quem ainda tá esperando a entrega da Black Friday passada.\n\nSegue o @penofreio.com.br pra rir antes de comprar.\n\nImagem feita com IA. Música: \"Llama in Pajama\", Rafael Krux (domínio público).\n\n#fretegratis #blackfriday #humor #financaspessoais",
-    "alt": "Tartaruga atravessando devagar o corredor comprido de um prédio com uma pequena caixa de entrega amarrada no casco.",
-    "ia": true,
-    "publicado": null,
-    "video": "2026-11-28-m15.mp4"
+    "quando": "2026-11-27T19:00:00-03:00",
+    "lembrete": "Pé no Freio: amanhã, sábado 28/11, às 12h, você publica o meme da tartaruga (m15) pelo app. Mando o vídeo e a legenda agora pra você já deixar salvo, e lembro de novo às 11h50.\n\nNo app: + > Reels > escolher o vídeo > Áudio: uma música em alta (seta de tendência) > colar a legenda > Configurações avançadas: ligar \"Rótulo de IA\" > Compartilhar.",
+    "video": "2026-11-28-m15-sem-musica.mp4",
+    "texto_app": "Pra esses momentos: pé no freio.\n\nManda pra quem ainda tá esperando a entrega da Black Friday passada.\n\nSegue o @penofreio.com.br pra rir antes de comprar.\n\nImagem feita com IA.\n\n#fretegratis #blackfriday #humor #financaspessoais"
+  },
+  {
+    "quando": "2026-11-28T11:50:00-03:00",
+    "lembrete": "Pé no Freio: daqui a 10 min, 12h, publica o meme da tartaruga pelo app, com música em alta e rótulo de IA ligado. Vídeo e legenda logo abaixo.",
+    "video": "2026-11-28-m15-sem-musica.mp4",
+    "texto_app": "Pra esses momentos: pé no freio.\n\nManda pra quem ainda tá esperando a entrega da Black Friday passada.\n\nSegue o @penofreio.com.br pra rir antes de comprar.\n\nImagem feita com IA.\n\n#fretegratis #blackfriday #humor #financaspessoais"
   },
   {
     "quando": "2026-11-28T19:00:00-03:00",

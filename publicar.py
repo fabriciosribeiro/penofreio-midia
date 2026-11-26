@@ -5,7 +5,12 @@ Roda no GitHub Actions duas vezes por hora (o GitHub atrasa ou pula rodadas agen
 post espera o horário). Publica no máximo um post por execução.
 MODO=teste: prepara o contêiner do próximo post pendente e confere se a Meta aceitou a imagem, SEM publicar.
 
-Segredos (GitHub Actions): INSTAGRAM_ACCESS_TOKEN e INSTAGRAM_USER_ID. O token nunca é impresso.
+Lembretes: item com "lembrete" (texto) não publica nada; manda o texto ao fundador pelo Telegram na hora marcada,
+com o vídeo de "video" (em imagens/) e o "texto_app" numa mensagem separada, pronta para copiar. O robô também avisa
+no Telegram quando publica ou falha.
+
+Segredos (GitHub Actions): INSTAGRAM_ACCESS_TOKEN e INSTAGRAM_USER_ID; TELEGRAM_BOT_TOKEN e TELEGRAM_CHAT_ID
+(opcionais: sem eles, os avisos só vão para o log). Os tokens nunca são impressos.
 """
 import datetime, json, os, sys, time, urllib.error, urllib.parse, urllib.request
 
@@ -33,6 +38,34 @@ def chamar(metodo, caminho, **params):
     except urllib.error.HTTPError as e:
         erro = json.loads(e.read().decode() or "{}").get("error", {})
         return {"erro": e.code, "mensagem": erro.get("message"), "detalhe": erro.get("error_user_msg")}
+
+
+def telegram(metodo, **params):
+    tk, chat = os.environ.get("TELEGRAM_BOT_TOKEN"), os.environ.get("TELEGRAM_CHAT_ID")
+    if not (tk and chat):
+        print(f"(sem Telegram configurado) {params.get('text') or params.get('caption')}")
+        return False
+    req = urllib.request.Request(f"https://api.telegram.org/bot{tk}/{metodo}",
+                                 data=urllib.parse.urlencode({"chat_id": chat, **params}).encode())
+    try:
+        return json.load(urllib.request.urlopen(req, timeout=60)).get("ok", False)
+    except urllib.error.URLError as e:  # sem o token na mensagem
+        print(f"Telegram falhou em {metodo}: {getattr(e, 'code', '')} {getattr(e, 'reason', '')}")
+        return False
+
+
+def avisar(texto):
+    telegram("sendMessage", text=texto, disable_web_page_preview="true")
+
+
+def enviar_lembrete(item):
+    ok = telegram("sendMessage", text=item["lembrete"], disable_web_page_preview="true")
+    if ok and item.get("video"):
+        ok = telegram("sendVideo", video=f"https://raw.githubusercontent.com/{REPO}/main/imagens/{item['video']}",
+                      caption="Vídeo para publicar pelo app (sem música).")
+    if ok and item.get("texto_app"):
+        ok = telegram("sendMessage", text=item["texto_app"])
+    return ok
 
 
 def esperar(cid, vezes):
@@ -110,7 +143,7 @@ def ja_publicado(item):
 def main():
     fila = json.load(open(FILA, encoding="utf-8"))
     agora = datetime.datetime.now(datetime.timezone.utc)
-    pendentes = [i for i in fila if not i.get("publicado")]
+    pendentes = [i for i in fila if not i.get("publicado") and not i.get("lembrete")]
     if MODO == "teste":
         if not pendentes:
             sys.exit("Nada pendente na fila.")
@@ -124,9 +157,16 @@ def main():
         print(f"{proximos[0]['imagem']} sai em {int(espera // 60)} min: esperando o horário.", flush=True)
         time.sleep(espera)
         agora = datetime.datetime.now(datetime.timezone.utc)
+    for lem in fila:  # lembretes vencidos (até 12 h de atraso) vão pelo Telegram
+        quando = datetime.datetime.fromisoformat(lem["quando"])
+        if lem.get("lembrete") and not lem.get("enviado") and quando <= agora < quando + ATRASO_MAXIMO:
+            if enviar_lembrete(lem):
+                lem["enviado"] = agora.isoformat(timespec="minutes")
+                print(f"Lembrete enviado: {lem['lembrete'][:60]}")
     vencidos = [i for i in pendentes if datetime.datetime.fromisoformat(i["quando"]) <= agora]
     if not vencidos:
         print("Nada para publicar agora.")
+        gravar(fila)
         return
     alvo = None
     for item in vencidos:  # marca o que já está no ar; publica no máximo um
@@ -136,19 +176,32 @@ def main():
             item["publicado"] = {"id": achado["id"], "link": achado.get("permalink"), "em": agora.isoformat(timespec="minutes")}
         elif agora - datetime.datetime.fromisoformat(item["quando"]) > ATRASO_MAXIMO:
             print(f"AVISO: {item['imagem']} passou mais de 12 h do horário; não publico sozinho.")
+            if not item.get("avisado"):
+                avisar(f"Pé no Freio: {item['imagem']} passou mais de 12 h do horário e não saiu. Fala com o Claude.")
+                item["avisado"] = True
         elif alvo is None:
             alvo = item
     if alvo:
         item = alvo
-        cid, st = preparar(item)
-        if st != "FINISHED":
-            sys.exit(f"Contêiner de {item['imagem']} ficou {st}.")
-        r = chamar("POST", f"{UID}/media_publish", creation_id=cid)
-        if "id" not in r:
-            sys.exit(f"Falha ao publicar {item['imagem']}: {r}")
+        try:
+            cid, st = preparar(item)
+            if st != "FINISHED":
+                sys.exit(f"Contêiner de {item['imagem']} ficou {st}.")
+            r = chamar("POST", f"{UID}/media_publish", creation_id=cid)
+            if "id" not in r:
+                sys.exit(f"Falha ao publicar {item['imagem']}: {r}")
+        except SystemExit as e:
+            avisar(f"Pé no Freio: o robô NÃO publicou {item['imagem']}. Motivo: {e}. Fala com o Claude.")
+            gravar(fila)
+            raise
         info = chamar("GET", r["id"], fields="permalink")
         item["publicado"] = {"id": r["id"], "link": info.get("permalink"), "em": agora.isoformat(timespec="minutes")}
         print(f"Publicado {item['imagem']}: {info.get('permalink')}")
+        avisar(f"Pé no Freio: saiu {item['imagem']}. {info.get('permalink') or ''}")
+    gravar(fila)
+
+
+def gravar(fila):
     json.dump(fila, open(FILA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     open(FILA, "a").write("\n")
 
