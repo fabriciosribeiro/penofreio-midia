@@ -252,6 +252,10 @@
     "publicado": null
   },
   {
+    "quando": "2026-12-02T09:00:00-03:00",
+    "lembrete": "Pé no Freio: hoje, 2/12, é o dia da decisão sobre o ritmo dos Reels (combinado em 26/11).\n\nPasso a passo (2 min):\n1. No computador, abra o VS Code na pasta pe-no-freio-marketing.\n2. Abra uma conversa com o Claude.\n3. Cole esta frase: \"Hoje é a decisão de 2/12 sobre o ritmo dos Reels. Leia conhecimento/metricas/leituras-reels.csv e a pesquisa em analises/2026-11-26-pesquisa-alcance e me diga se mantemos 2 Reels por dia ou passamos para 1 com músicas alternadas.\"\n4. Responda às perguntas do bloco \"Preciso de você\" no fim da resposta.\n\nA regra combinada: se os Reels de 30/11 a 2/12 voltarem a 100 pessoas ou mais, fica como está. Se ficarem abaixo de 40, de 3 a 9/12 vai 1 Reels por dia, com 3 ou 4 músicas diferentes."
+  },
+  {
     "quando": "2026-12-18T12:00:00-03:00",
     "imagem": "2026-12-18-m03.jpg",
     "video": "2026-12-18-m03.mp4",
